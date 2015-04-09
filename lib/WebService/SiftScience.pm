@@ -32,6 +32,10 @@ method create_account (Str $user_id, %params) {
     return $self->event($user_id, '$create_account', %params);
 }
 
+method update_account (Str $user_id, %params) {
+    return $self->event($user_id, '$update_account', %params);
+}
+
 method create_order (Str $user_id, %params) {
     return $self->event($user_id, '$create_order', %params);
 }
