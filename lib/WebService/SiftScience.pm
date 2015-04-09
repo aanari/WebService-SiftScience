@@ -11,6 +11,10 @@ has api_key     => ( is => 'ro', required => 1                    );
 has events_uri  => ( is => 'ro', default => '/events'             );
 has score_uri   => ( is => 'ro', default => '/score'              );
 
+method get_score (Str $user_id) {
+    return $self->get($self->score_uri);
+}
+
 method create_event (Str $user_id, Str $type, Maybe[HashRef] $data = {}) {
     return $self->post($self->events_uri, {
         '$type'      => $type,

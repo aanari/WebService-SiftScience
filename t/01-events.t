@@ -76,7 +76,6 @@ subtest 'Link Session to User' => sub {
         '"link_session_to_user" failed with garbage data';
 };
 
-
 subtest 'Custom Event' => sub {
     ok exception { ss->custom_event($id) },
         '"custom_event" failed with missing required params';
@@ -92,4 +91,5 @@ subtest 'Custom Event' => sub {
             "\"custom_event\" of \"$type\" with data" or diag explain $res;
     }
 };
+
 done_testing;
