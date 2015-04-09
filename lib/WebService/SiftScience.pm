@@ -52,4 +52,8 @@ method remove_item_from_cart (Str $user_id, %params) {
     return $self->event($user_id, '$remove_item_from_cart', %params);
 }
 
+method submit_review (Str $user_id, %params) {
+    return $self->event($user_id, '$submit_review', %params);
+}
+
 1;
