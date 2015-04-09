@@ -56,4 +56,8 @@ method submit_review (Str $user_id, %params) {
     return $self->event($user_id, '$submit_review', %params);
 }
 
+method send_message (Str $user_id, %params) {
+    return $self->event($user_id, '$send_message', %params);
+}
+
 1;

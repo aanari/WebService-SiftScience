@@ -11,6 +11,7 @@ subtest 'General Event Method Testing' => sub {
         create_account
         create_order
         remove_item_from_cart
+        send_message
         submit_review
         update_account
     /;
