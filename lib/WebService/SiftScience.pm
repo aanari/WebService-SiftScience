@@ -20,13 +20,21 @@ around qw/put post delete/ => func ($orig, $self, $uri, $params) {
 };
 
 method create_order (Str $user_id, %params) {
-    my $result = $self->post($self->events_uri, {
-        'type'    => 'create_order',
+    return $self->post($self->events_uri, {
+        'type'    => '$create_order',
         'api_key' => $self->api_key,
         'user_id' => $user_id,
         %params
     });
-    return $result;
+}
+
+method transaction (Str $user_id, %params) {
+    return $self->post($self->events_uri, {
+        'type'    => '$transaction',
+        'api_key' => $self->api_key,
+        'user_id' => $user_id,
+        %params
+    });
 }
 
 1;
