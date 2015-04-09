@@ -40,7 +40,7 @@ subtest 'General Event Method Testing' => sub {
 
 subtest 'Transaction' => sub {
     ok exception { ss->transaction($id) },
-        'Correctly failed with missing required params';
+        '"transaction" failed with missing required params';
 
     my %data = (
         amount        => 506790000,
@@ -49,15 +49,30 @@ subtest 'Transaction' => sub {
 
     my $res = ss->create_order($id, \%data);
     is $res->{error_message} => 'OK',
-        'Basic transaction with required params' or diag explain $res;
+        '"transaction" with required params' or diag explain $res;
 
     $data{order_id} = 555;
     $res = ss->create_order($id, \%data);
     is $res->{error_message} => 'OK',
-        'Basic transaction with required and optional params'
+        '"transaction" with required and optional params'
         or diag explain $res;
 
-    exception { ss->transaction($id, %garbage) };
+    ok exception { ss->transaction($id, %garbage) },
+        '"transaction" failed with garbage data';
+};
+
+subtest 'Link Session to User' => sub {
+    ok exception { ss->link_session_to_user($id) },
+        '"link_session_to_user" failed with missing required param';
+
+    my %data = ( session_id => 'ABC12345' );
+
+    my $res = ss->link_session_to_user($id, \%data);
+    is $res->{error_message} => 'OK',
+        '"link_session_to_user" with required param' or diag explain $res;
+
+    ok exception { ss->link_session_to_user($id, %garbage) },
+        '"link_session_to_user" failed with garbage data';
 };
 
 done_testing;

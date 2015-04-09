@@ -44,6 +44,10 @@ method transaction (Str $user_id, Maybe[HashRef] $data) {
     return $self->create_event($user_id, '$transaction', $data);
 }
 
+method link_session_to_user (Str $user_id, $data) {
+    return $self->create_event($user_id, '$link_session_to_user', $data);
+}
+
 method add_item_to_cart (Str $user_id, Maybe[HashRef] $data) {
     return $self->create_event($user_id, '$add_item_to_cart', $data);
 }
