@@ -5,8 +5,14 @@ plan skip_all => 'SIFT_SCIENCE_API_KEY not in ENV' unless defined ss();
 my $id = 1;
 my %garbage = (garbage => 'asdf12345');
 
-subtest 'Create Order, Create Account, Update Account' => sub {
-    my @events = qw/create_order create_account update_account/;
+subtest 'General Event Method Testing' => sub {
+    my @events = qw/
+        add_item_to_cart
+        create_account
+        create_order
+        remove_item_from_cart
+        update_account
+    /;
     for my $test (
         [{}                                 ,'"%s"'                    ],
         [{ session_id   => 1 }              ,'"%s" with param'         ],

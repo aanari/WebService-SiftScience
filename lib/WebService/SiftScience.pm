@@ -44,4 +44,12 @@ method transaction (Str $user_id, %params) {
     return $self->event($user_id, '$transaction', %params);
 }
 
+method add_item_to_cart (Str $user_id, %params) {
+    return $self->event($user_id, '$add_item_to_cart', %params);
+}
+
+method remove_item_from_cart (Str $user_id, %params) {
+    return $self->event($user_id, '$remove_item_from_cart', %params);
+}
+
 1;
