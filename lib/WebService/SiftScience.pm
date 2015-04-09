@@ -19,22 +19,25 @@ around qw/put post delete/ => func ($orig, $self, $uri, $params) {
     return $self->$orig($uri, $params);
 };
 
-method create_order (Str $user_id, %params) {
+method event (Str $user_id, Str $type, %params) {
     return $self->post($self->events_uri, {
-        'type'    => '$create_order',
+        'type'    => $type,
         'api_key' => $self->api_key,
         'user_id' => $user_id,
         %params
     });
 }
 
+method create_account (Str $user_id, %params) {
+    return $self->event($user_id, '$create_account', %params);
+}
+
+method create_order (Str $user_id, %params) {
+    return $self->event($user_id, '$create_order', %params);
+}
+
 method transaction (Str $user_id, %params) {
-    return $self->post($self->events_uri, {
-        'type'    => '$transaction',
-        'api_key' => $self->api_key,
-        'user_id' => $user_id,
-        %params
-    });
+    return $self->event($user_id, '$transaction', %params);
 }
 
 1;

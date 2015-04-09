@@ -5,19 +5,25 @@ plan skip_all => 'SIFT_SCIENCE_API_KEY not in ENV' unless defined ss();
 my $id = 1;
 my %garbage = (garbage => 'asdf12345');
 
-subtest 'Create Order' => sub {
+subtest 'Create Order, Create Account' => sub {
+    my @events = qw/create_order create_account/;
     for my $test (
-        [{}                                 ,'Basic order'                    ],
-        [{ session_id   => 1 }              ,'Basic order with param'         ],
-        [{'$user_email' => 'email@live.com'},'Basic order with $ prefix param'],
+        [{}                                 ,'"%s"'                    ],
+        [{ session_id   => 1 }              ,'"%s" with param'         ],
+        [{'$user_email' => 'email@live.com'},'"%s" with $ prefix param'],
     ) {
         my ($params, $message) = @$test;
-        my $res = ss->create_order($id, %$params);
-        is $res->{error_message} => 'OK', $message or diag explain $res;
+        for my $event (@events) {
+            my $res = ss->$event($id, %$params);
+            is $res->{error_message} => 'OK',
+                sprintf $message, $event or diag explain $res;
+        }
     }
 
-    ok exception { ss->create_order($id, %garbage ) },
-        'Correctly failed with garbage data';
+    for my $event (@events) {
+        ok exception { ss->$event($id, %garbage ) },
+            "\"$event\" failed with garbage data";
+    }
 };
 
 subtest 'Transaction' => sub {
