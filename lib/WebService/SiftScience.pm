@@ -19,45 +19,53 @@ around qw/put post delete/ => func ($orig, $self, $uri, $params) {
     return $self->$orig($uri, $params);
 };
 
-method event (Str $user_id, Str $type, %params) {
+method create_event (Str $user_id, Str $type, Maybe[HashRef] $data = {}) {
     return $self->post($self->events_uri, {
-        'type'    => $type,
-        'api_key' => $self->api_key,
-        'user_id' => $user_id,
-        %params
+        'type'      => $type,
+        'api_key'   => $self->api_key,
+        'user_id'   => $user_id,
+        ( %$data ) x!! $data,
     });
 }
 
-method create_account (Str $user_id, %params) {
-    return $self->event($user_id, '$create_account', %params);
+method create_account (Str $user_id, Maybe[HashRef] $data) {
+    return $self->create_event($user_id, '$create_account', $data);
 }
 
-method update_account (Str $user_id, %params) {
-    return $self->event($user_id, '$update_account', %params);
+method update_account (Str $user_id, Maybe[HashRef] $data) {
+    return $self->create_event($user_id, '$update_account', $data);
 }
 
-method create_order (Str $user_id, %params) {
-    return $self->event($user_id, '$create_order', %params);
+method create_order (Str $user_id, Maybe[HashRef] $data) {
+    return $self->create_event($user_id, '$create_order', $data);
 }
 
-method transaction (Str $user_id, %params) {
-    return $self->event($user_id, '$transaction', %params);
+method transaction (Str $user_id, Maybe[HashRef] $data) {
+    return $self->create_event($user_id, '$transaction', $data);
 }
 
-method add_item_to_cart (Str $user_id, %params) {
-    return $self->event($user_id, '$add_item_to_cart', %params);
+method add_item_to_cart (Str $user_id, Maybe[HashRef] $data) {
+    return $self->create_event($user_id, '$add_item_to_cart', $data);
 }
 
-method remove_item_from_cart (Str $user_id, %params) {
-    return $self->event($user_id, '$remove_item_from_cart', %params);
+method remove_item_from_cart (Str $user_id, Maybe[HashRef] $data) {
+    return $self->create_event($user_id, '$remove_item_from_cart', $data);
 }
 
-method submit_review (Str $user_id, %params) {
-    return $self->event($user_id, '$submit_review', %params);
+method submit_review (Str $user_id, Maybe[HashRef] $data) {
+    return $self->create_event($user_id, '$submit_review', $data);
 }
 
-method send_message (Str $user_id, %params) {
-    return $self->event($user_id, '$send_message', %params);
+method send_message (Str $user_id, Maybe[HashRef] $data) {
+    return $self->create_event($user_id, '$send_message', $data);
+}
+
+method login (Str $user_id, Maybe[HashRef] $data) {
+    return $self->create_event($user_id, '$login', $data);
+}
+
+method logout (Str $user_id) {
+    return $self->create_event($user_id, '$logout');
 }
 
 1;

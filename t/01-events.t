@@ -10,26 +10,30 @@ subtest 'General Event Method Testing' => sub {
         add_item_to_cart
         create_account
         create_order
+        login
         remove_item_from_cart
         send_message
         submit_review
         update_account
     /;
     for my $test (
-        [{}                                 ,'"%s"'                    ],
-        [{ session_id   => 1 }              ,'"%s" with param'         ],
-        [{'$user_email' => 'email@live.com'},'"%s" with $ prefix param'],
+        [ {}                                 ,'"%s" with empty hash'     ],
+        [ { session_id   => 1 }              ,'"%s" with param'          ],
+        [ {'$user_email' => 'email@live.com'},'"%s" with $ prefix param' ],
     ) {
-        my ($params, $message) = @$test;
+        my ($data, $message) = @$test;
         for my $event (@events) {
-            my $res = ss->$event($id, %$params);
+            my $res = ss->$event($id, $data);
             is $res->{error_message} => 'OK',
                 sprintf $message, $event or diag explain $res;
         }
     }
 
+    my $res = ss->logout($id);
+    is $res->{error_message} => 'OK', '"logout"' or diag explain $res;
+
     for my $event (@events) {
-        ok exception { ss->$event($id, %garbage ) },
+        ok exception { ss->$event($id, \%garbage ) },
             "\"$event\" failed with garbage data";
     }
 };
@@ -38,17 +42,17 @@ subtest 'Transaction' => sub {
     ok exception { ss->transaction($id) },
         'Correctly failed with missing required params';
 
-    my %params = (
+    my %data = (
         amount        => 506790000,
         currency_code => 'USD',
     );
 
-    my $res = ss->create_order($id, %params);
+    my $res = ss->create_order($id, \%data);
     is $res->{error_message} => 'OK',
         'Basic transaction with required params' or diag explain $res;
 
-    $params{order_id} = 555;
-    $res = ss->create_order($id, %params);
+    $data{order_id} = 555;
+    $res = ss->create_order($id, \%data);
     is $res->{error_message} => 'OK',
         'Basic transaction with required and optional params'
         or diag explain $res;
