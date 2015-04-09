@@ -1,9 +1,10 @@
 use Test::Modern;
 use t::lib::Harness qw(ss);
+use DateTime;
 plan skip_all => 'SIFT_SCIENCE_API_KEY not in ENV' unless defined ss();
 
 my $id = 1;
-my %garbage = (garbage => 'asdf12345');
+my %garbage = ('$garbage' => 'asdf12345');
 
 subtest 'General Event Method Testing' => sub {
     my @events = qw/
@@ -17,9 +18,9 @@ subtest 'General Event Method Testing' => sub {
         update_account
     /;
     for my $test (
-        [ {}                                 ,'"%s" with empty hash'     ],
-        [ { session_id   => 1 }              ,'"%s" with param'          ],
-        [ {'$user_email' => 'email@live.com'},'"%s" with $ prefix param' ],
+        [ {}                                        , '"%s" w/ empty hash'   ],
+        [ {'$user_email' => 'email@live.com'       }, '"%s" w/ param'        ],
+        [ { custom_date  => DateTime->now->iso8601 }, '"%s" w/ custom field' ],
     ) {
         my ($data, $message) = @$test;
         for my $event (@events) {
@@ -43,15 +44,15 @@ subtest 'Transaction' => sub {
         '"transaction" failed with missing required params';
 
     my %data = (
-        amount        => 506790000,
-        currency_code => 'USD',
+        '$amount'        => 506790000,
+        '$currency_code' => 'USD',
     );
 
     my $res = ss->create_order($id, \%data);
     is $res->{error_message} => 'OK',
         '"transaction" with required params' or diag explain $res;
 
-    $data{order_id} = 555;
+    $data{'$order_id'} = 555;
     $res = ss->create_order($id, \%data);
     is $res->{error_message} => 'OK',
         '"transaction" with required and optional params'
@@ -75,4 +76,20 @@ subtest 'Link Session to User' => sub {
         '"link_session_to_user" failed with garbage data';
 };
 
+
+subtest 'Custom Event' => sub {
+    ok exception { ss->custom_event($id) },
+        '"custom_event" failed with missing required params';
+
+    for my $event (
+        [ 'make_call',       { call_duration   => 448                    }],
+        [ 'create_campaign', { campaign_status => 'expired'              }],
+        [ 'empty_trash',     { last_emptied    => DateTime->now->iso8601 }],
+    ) {
+        my ($type, $data) = @$event;
+        my $res = ss->custom_event($id, $type, $data);
+        is $res->{error_message} => 'OK',
+            "\"custom_event\" of \"$type\" with data" or diag explain $res;
+    }
+};
 done_testing;

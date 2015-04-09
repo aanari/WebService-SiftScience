@@ -11,19 +11,11 @@ has api_key     => ( is => 'ro', required => 1                    );
 has events_uri  => ( is => 'ro', default => '/events'             );
 has score_uri   => ( is => 'ro', default => '/score'              );
 
-around qw/put post delete/ => func ($orig, $self, $uri, $params) {
-    for my $old_key (keys %$params) {
-        my $new_key = (($old_key =~ /^\$/ ? '' : '$') . $old_key);
-        $params->{$new_key} = delete $params->{$old_key};
-    }
-    return $self->$orig($uri, $params);
-};
-
 method create_event (Str $user_id, Str $type, Maybe[HashRef] $data = {}) {
     return $self->post($self->events_uri, {
-        'type'      => $type,
-        'api_key'   => $self->api_key,
-        'user_id'   => $user_id,
+        '$type'      => $type,
+        '$api_key'   => $self->api_key,
+        '$user_id'   => $user_id,
         ( %$data ) x!! $data,
     });
 }
@@ -70,6 +62,10 @@ method login (Str $user_id, Maybe[HashRef] $data) {
 
 method logout (Str $user_id) {
     return $self->create_event($user_id, '$logout');
+}
+
+method custom_event (Str $user_id, Str $type, Maybe[HashRef] $data) {
+    return $self->create_event($user_id, $type, $data);
 }
 
 1;
